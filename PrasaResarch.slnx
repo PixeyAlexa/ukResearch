@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="PrasaResarch.Tests/PrasaResarch.Tests.csproj" />
+  <Project Path="PrasaResarch/PrasaResarch.csproj" />
+  <Project Path="PrasaResearch.Core.Tests/PrasaResearch.Core.Tests.csproj" />
+  <Project Path="PrasaResearch.Core/PrasaResearch.Core.csproj" />
+  <Project Path="PrasaResearch.Desktop/PrasaResearch.Desktop.csproj" />
+</Solution>

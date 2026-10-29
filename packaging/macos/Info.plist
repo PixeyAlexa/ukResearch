@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+ <key>CFBundleIdentifier</key><string>com.prasaresearch.desktop</string>
+ <key>CFBundleName</key><string>PrasaResearch</string>
+ <key>CFBundleDisplayName</key><string>PrasaResearch</string>
+ <key>CFBundleExecutable</key><string>PrasaResearch</string>
+ <key>CFBundlePackageType</key><string>APPL</string>
+ <key>CFBundleShortVersionString</key><string>1.0.0</string>
+ <key>CFBundleVersion</key><string>1.0.0</string>
+ <key>CFBundleIconFile</key><string>PrasaResearch.icns</string>
+ <key>NSHighResolutionCapable</key><true/>
+ <key>NSPrincipalClass</key><string>NSApplication</string>
+ <key>LSApplicationCategoryType</key><string>public.app-category.finance</string>
+</dict></plist>

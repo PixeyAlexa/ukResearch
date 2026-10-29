@@ -1,0 +1,129 @@
+﻿<Window x:Class="PrasaResarch.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+ Title="PrasaResearch • Companies House Revenue Explorer" Width="1480" Height="960" MinWidth="1080" MinHeight="720" WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanResize" Background="{DynamicResource AppBackground}" FontFamily="Segoe UI" Foreground="#EEF4FF">
+ <shell:WindowChrome.WindowChrome><shell:WindowChrome CaptionHeight="80" ResizeBorderThickness="7" CornerRadius="0" GlassFrameThickness="0"/></shell:WindowChrome.WindowChrome>
+ <Grid>
+  <Grid.RowDefinitions><RowDefinition Height="80"/><RowDefinition Height="*"/><RowDefinition Height="64"/></Grid.RowDefinitions>
+  <Border BorderBrush="#243552" BorderThickness="0,0,0,1" Background="#0A1427">
+   <Grid Margin="24,0,12,0"><Grid.ColumnDefinitions><ColumnDefinition Width="300"/><ColumnDefinition Width="*"/><ColumnDefinition Width="160"/></Grid.ColumnDefinitions>
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"><TextBlock Text="&#x25A5;" FontSize="40" Foreground="#4C97FF" Margin="0,0,14,0"/><StackPanel><TextBlock Text="UK Companies House" FontSize="19" FontWeight="SemiBold"/><TextBlock Text="Revenue Explorer" Foreground="{StaticResource Muted}" Margin="0,4,0,0"/></StackPanel></StackPanel>
+    <TextBlock Grid.Column="1" Text="PRASA RESEARCH  /  FINANCIAL INTELLIGENCE" FontSize="12" Foreground="#7592BB" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" shell:WindowChrome.IsHitTestVisibleInChrome="True"><Button Content="-" Padding="10,8" Margin="0" Background="Transparent" BorderThickness="0" Click="Minimize_Click" ToolTip="Minimize"/><Button Content="&#x25A1;" Padding="10,8" Margin="0" Background="Transparent" BorderThickness="0" Click="Maximize_Click" ToolTip="Maximize or restore"/><Button Content="&#x2715;" Padding="10,8" Margin="0" Background="Transparent" BorderThickness="0" Click="Close_Click" ToolTip="Close"/></StackPanel>
+   </Grid>
+  </Border>
+  <Grid Grid.Row="1"><Grid.ColumnDefinitions><ColumnDefinition Width="218"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+   <Border Margin="10,12,0,0" BorderBrush="#243E63" BorderThickness="1" CornerRadius="15" Background="#0A1529"><DockPanel>
+    <StackPanel DockPanel.Dock="Bottom" Margin="22,20"><TextBlock Text="&#x265C;" FontSize="35" Foreground="#94BFFF"/><TextBlock Text="Companies House" FontSize="17" Margin="0,8,0,0"/><TextBlock Text="UK Government Data" Style="{StaticResource MutedText}" Margin="0,4,0,0"/><TextBlock Text="Official API · Real filings" FontSize="11" Foreground="#6886AE" Margin="0,14,0,0"/></StackPanel>
+    <StackPanel><TextBlock Text="WORKSPACE" FontSize="10" Foreground="#6680A7" Margin="24,24,0,10"/><ListBox ItemsSource="{Binding Navigation}" SelectedItem="{Binding Section}" BorderThickness="0" Background="Transparent" FontSize="14"/></StackPanel>
+   </DockPanel></Border>
+   <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="24,18,24,0">
+    <StackPanel>
+     <Grid Margin="0,0,0,20"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="300"/></Grid.ColumnDefinitions>
+      <StackPanel VerticalAlignment="Center"><TextBlock Text="UK Companies House" FontSize="32" FontWeight="SemiBold"/><TextBlock Text="Revenue Explorer" FontSize="27" Foreground="#9AB4FF"/><TextBlock Text="Find UK companies. Read filed accounts. Trace every figure to its source." Foreground="{StaticResource Muted}" Margin="0,10,12,0" TextWrapping="Wrap"/></StackPanel>
+      <Border Grid.Column="1" Style="{StaticResource PanelStyle}" Margin="12,0,0,0" Padding="18"><StackPanel><TextBlock Text="&#x2713;  Official Companies House API" Foreground="#A7C7FF"/><TextBlock Text="&#x2713;  Latest relevant filed accounts" Margin="0,12,0,0" Foreground="#A7C7FF"/><TextBlock Text="&#x2713;  Evidence and review status" Margin="0,12,0,0" Foreground="#A7C7FF"/></StackPanel></Border>
+     </Grid>
+     <Border Style="{StaticResource PanelStyle}" Visibility="{Binding IsSingle, Converter={StaticResource BoolVisibility}}"><StackPanel>
+      <TextBlock Text="&#x2315;  Single Company Search" Style="{StaticResource Heading}"/>
+      <TextBlock Text="Company registration number" Foreground="{StaticResource Muted}" Margin="0,0,0,8"/>
+      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="180"/><ColumnDefinition Width="200"/></Grid.ColumnDefinitions><TextBox Text="{Binding Number, UpdateSourceTrigger=PropertyChanged}" ToolTip="Company number, including any prefix and leading zeros"><TextBox.InputBindings><KeyBinding Key="Enter" Command="{Binding SearchCommand}"/></TextBox.InputBindings></TextBox><Button Grid.Column="1" Content="&#x2315;  Get Revenue" Command="{Binding SearchCommand}" Style="{StaticResource PrimaryButton}" Margin="18,0,0,0"/><Button Grid.Column="2" Content="View Company Profile" Command="{Binding ProfileCommand}" CommandParameter="Input" Margin="14,0,0,0"/></Grid>
+     </StackPanel></Border>
+     <Border Style="{StaticResource PanelStyle}" Visibility="{Binding IsBulk, Converter={StaticResource BoolVisibility}}" AllowDrop="True" DragOver="Import_DragOver" Drop="Import_Drop"><StackPanel>
+      <TextBlock Text="&#x21E7;  Bulk Import (Excel / CSV)" Style="{StaticResource Heading}"/>
+      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="170"/><ColumnDefinition Width="185"/></Grid.ColumnDefinitions>
+       <Border BorderBrush="#335889" BorderThickness="1" Background="#0A172D" CornerRadius="10" Padding="16"><StackPanel><TextBlock Text="Drag &amp; drop your Excel or CSV file here"/><TextBlock Text="{Binding ImportInfo}" Style="{StaticResource MutedText}" Margin="0,6,0,0"/></StackPanel></Border>
+       <Button Grid.Column="1" Content="Browse File" Command="{Binding BrowseCommand}" Margin="16,8,0,8"/><Button Grid.Column="2" Content="Add to Queue" Command="{Binding QueueImportCommand}" Style="{StaticResource PrimaryButton}" Margin="14,8,0,8"/>
+      </Grid>
+      <StackPanel Orientation="Horizontal" Margin="0,12,0,0" Visibility="{Binding IsBulkDetails, Converter={StaticResource BoolVisibility}}"><TextBlock Text="Company number column" VerticalAlignment="Center" Foreground="{StaticResource Muted}" Margin="0,0,12,0"/><ComboBox ItemsSource="{Binding ImportColumns}" SelectedIndex="{Binding ImportColumn}" MinWidth="240"/></StackPanel>
+      <TextBlock Visibility="{Binding IsBulkDetails, Converter={StaticResource BoolVisibility}}" Text="{Binding ImportPreviewText}" Style="{StaticResource MutedText}" Margin="0,10,0,0" MaxHeight="110" TextTrimming="CharacterEllipsis"/>
+     </StackPanel></Border>
+     <UniformGrid Columns="5" Margin="0,0,0,14" Visibility="{Binding IsResults, Converter={StaticResource BoolVisibility}}">
+      <Border CornerRadius="13" BorderBrush="#277CE0" BorderThickness="1" Background="#102749" Padding="16" Margin="0,0,10,0"><StackPanel><TextBlock Text="Total Companies" Foreground="#8ABFFF" FontSize="12"/><TextBlock Text="{Binding Total, StringFormat=N0}" FontSize="30" FontWeight="SemiBold" Margin="0,5,0,0"/></StackPanel></Border>
+      <Border CornerRadius="13" BorderBrush="#208F72" BorderThickness="1" Background="#0B302D" Padding="16" Margin="0,0,10,0"><StackPanel><TextBlock Text="Revenue Found" Foreground="#8AE1C4" FontSize="12"/><TextBlock Text="{Binding Found, StringFormat=N0}" FontSize="30" FontWeight="SemiBold" Margin="0,5,0,0"/></StackPanel></Border>
+      <Border CornerRadius="13" BorderBrush="#9E7929" BorderThickness="1" Background="#302713" Padding="16" Margin="0,0,10,0"><StackPanel><TextBlock Text="Not Disclosed" Foreground="#F0CA75" FontSize="12"/><TextBlock Text="{Binding NotDisclosed, StringFormat=N0}" FontSize="30" FontWeight="SemiBold" Margin="0,5,0,0"/></StackPanel></Border>
+      <Border CornerRadius="13" BorderBrush="#A05066" BorderThickness="1" Background="#302133" Padding="16" Margin="0,0,10,0"><StackPanel><TextBlock Text="Failed / Unavailable" Foreground="#ED9CAE" FontSize="12"/><TextBlock Text="{Binding Failed, StringFormat=N0}" FontSize="30" FontWeight="SemiBold" Margin="0,5,0,0"/></StackPanel></Border>
+      <Border CornerRadius="13" BorderBrush="#7749CD" BorderThickness="1" Background="#221640" Padding="16"><StackPanel><TextBlock Text="Currently Processing" Foreground="#C5A5FF" FontSize="12"/><TextBlock Text="{Binding ProcessingCount}" FontSize="30" FontWeight="SemiBold" Margin="0,5,0,0"/></StackPanel></Border>
+     </UniformGrid>
+     <Border Style="{StaticResource PanelStyle}"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel VerticalAlignment="Center"><TextBlock Text="{Binding ProgressText}" Foreground="#BDD2F3"/><TextBlock Text="{Binding Message}" Foreground="#87C7FF" FontSize="12" TextWrapping="Wrap" Margin="0,6,18,0"/><ProgressBar Value="{Binding Progress, Mode=OneWay}" Margin="0,10,18,0"/></StackPanel><Button Grid.Column="1" Content="Start Processing" Command="{Binding StartCommand}" Style="{StaticResource PrimaryButton}"/><Button Grid.Column="2" Content="{Binding PauseLabel}" Command="{Binding PauseCommand}"/><Button Grid.Column="3" Content="Cancel" Command="{Binding CancelCommand}"/></Grid></Border>
+     <Border Style="{StaticResource PanelStyle}" Visibility="{Binding IsResults, Converter={StaticResource BoolVisibility}}"><StackPanel>
+      <Grid Margin="0,0,0,14"><TextBlock Text="&#x2637;  Results" Style="{StaticResource Heading}" Margin="0" VerticalAlignment="Center"/><StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="Refresh" Command="{Binding RefreshCommand}"/><Button Content="Export Results" Command="{Binding ExportCommand}"/><Button Content="Clear All" Command="{Binding ClearCommand}"/></StackPanel></Grid>
+      <Grid Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="200"/></Grid.ColumnDefinitions><TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" ToolTip="Filter by company name or number"/><ComboBox Grid.Column="1" ItemsSource="{Binding Filters}" SelectedItem="{Binding Filter}" Margin="12,0,0,0"/></Grid>
+      <DataGrid x:Name="PrimaryResultsGrid" ItemsSource="{Binding ResultsView}" SelectedItem="{Binding Selected}" Height="300" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True">
+       <DataGrid.Columns>
+        <DataGridTextColumn Header="Company Registration Number" Binding="{Binding CompanyNumber}" Width="210"/>
+        <DataGridTextColumn Header="Company Name" Binding="{Binding CompanyName}" Width="*" MinWidth="180"/>
+        <DataGridTextColumn Header="Latest Revenue" Binding="{Binding RevenueDisplay}" SortMemberPath="Revenue" Width="160">
+         <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}"><Setter Property="ToolTip" Value="{Binding ReportingEntity, StringFormat=Reporting basis: {0}}"/></Style></DataGridTextColumn.ElementStyle>
+        </DataGridTextColumn>
+        <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" Width="85"/>
+        <DataGridTextColumn Header="Financial Year" Binding="{Binding FinancialYear}" Width="110"/>
+        <DataGridTextColumn Header="Extraction Status" Binding="{Binding PrimaryStatus}" Width="220"/>
+        <DataGridTextColumn Header="Source Document" Binding="{Binding SourceUrl}" Width="300"/>
+       </DataGrid.Columns>
+      </DataGrid>
+      <WrapPanel Margin="0,14,0,12"><Button Content="View Company Profile" Command="{Binding ProfileCommand}"/><Button Content="Open Original Filing &#x2197;" Command="{Binding FilingCommand}"/><Button Content="Download Source" Command="{Binding DownloadCommand}"/><Button Content="Retry Extraction" Command="{Binding RetryCommand}"/></WrapPanel>
+      <TextBlock Text="Company details &amp; extraction evidence" FontWeight="SemiBold" Margin="0,0,0,10"/>
+      <TextBox Text="{Binding SelectedDetails, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap" MinHeight="220" MaxHeight="360" VerticalScrollBarVisibility="Auto" Foreground="#D9E7FF" FontSize="14"/>
+      <Expander Header="Revenue evidence and manual review" Foreground="#EDF3FF" Margin="0,16,0,0">
+       <StackPanel Margin="0,12,0,0">
+        <DataGrid ItemsSource="{Binding Selected.Candidates}" SelectedItem="{Binding SelectedCandidate}" Height="180">
+         <DataGrid.Columns>
+          <DataGridTextColumn Header="Page" Binding="{Binding Page}" Width="65"/>
+          <DataGridTextColumn Header="Year" Binding="{Binding Year}" Width="75"/>
+          <DataGridTextColumn Header="Entity" Binding="{Binding Entity}" Width="100"/>
+          <DataGridTextColumn Header="Amount (full units)" Binding="{Binding Amount, StringFormat=N2}" Width="180"/>
+          <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" Width="80"/>
+          <DataGridTextColumn Header="Exact" Binding="{Binding Exact}" Width="70"/>
+          <DataGridTextColumn Header="Issue" Binding="{Binding Issue}" Width="300"/>
+         </DataGrid.Columns>
+        </DataGrid>
+        <TextBox Text="{Binding CandidateEvidence, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap" Height="180" VerticalScrollBarVisibility="Auto" Margin="0,10,0,12"/>
+        <Button Content="Open original PDF for review" Command="{Binding OpenReviewPdfCommand}" HorizontalAlignment="Left" Margin="0,0,0,12"/>
+        <TextBlock Text="Manual confirmation — enter the exact full amount after inspecting the source. Rounded narrative figures are supporting evidence only." TextWrapping="Wrap" Foreground="#BDD2F3" Margin="0,0,0,10"/>
+        <UniformGrid Columns="3">
+         <StackPanel Margin="0,0,12,10"><TextBlock Text="Exact revenue (full units)"/><TextBox Text="{Binding ReviewAmount}"/></StackPanel>
+         <StackPanel Margin="0,0,12,10"><TextBlock Text="Currency code"/><TextBox Text="{Binding ReviewCurrency}"/></StackPanel>
+         <StackPanel Margin="0,0,0,10"><TextBlock Text="Reporting entity"/><ComboBox ItemsSource="{Binding ReviewEntities}" SelectedItem="{Binding ReviewEntity}"/></StackPanel>
+        </UniformGrid>
+        <UniformGrid Columns="2"><StackPanel Margin="0,0,12,10"><TextBlock Text="Period end (yyyy-MM-dd)"/><TextBox Text="{Binding ReviewPeriod}"/></StackPanel><StackPanel Margin="0,0,0,10"><TextBlock Text="Source PDF page"/><TextBox Text="{Binding ReviewPage}"/></StackPanel></UniformGrid>
+        <TextBlock Text="Review reason / source evidence"/><TextBox Text="{Binding ReviewReason}" TextWrapping="Wrap" MinHeight="60"/>
+        <CheckBox Content="I inspected the original PDF and confirmed the year, exact amount, currency, scale and entity." IsChecked="{Binding SourceInspected}"/>
+        <Button Content="Confirm manually verified revenue" Command="{Binding ConfirmRevenueCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left"/>
+        <TextBlock Text="Manual review audit history" FontWeight="SemiBold" Margin="0,16,0,8"/>
+        <TextBox Text="{Binding ReviewHistory, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="200" VerticalScrollBarVisibility="Auto"/>
+       </StackPanel>
+      </Expander>
+     </StackPanel></Border>
+     <Border Style="{StaticResource PanelStyle}" Visibility="{Binding IsExport, Converter={StaticResource BoolVisibility}}"><StackPanel><TextBlock Text="Export financial results" Style="{StaticResource Heading}"/><TextBlock Text="Export actual extracted values, reporting periods, status and original filing links. Excel keeps revenue numeric and company numbers as text." Style="{StaticResource MutedText}" Margin="0,0,0,20"/><ComboBox ItemsSource="{Binding ExportScopes}" SelectedItem="{Binding ExportScope}" HorizontalAlignment="Left" Width="280"/><Button Content="Export to Excel or CSV" Command="{Binding ExportCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Margin="0,20,0,0"/></StackPanel></Border>
+     <Border Style="{StaticResource PanelStyle}" Visibility="{Binding IsSettings, Converter={StaticResource BoolVisibility}}"><StackPanel>
+      <TextBlock Text="Settings &amp; API Connection" Style="{StaticResource Heading}"/>
+      <TextBlock Text="Companies House API key" Margin="0,0,0,8"/><PasswordBox x:Name="ApiKeyBox"/>
+      <TextBlock Text="Encrypted with Windows DPAPI for your current user. Never included in exports." Style="{StaticResource MutedText}" Margin="0,8,0,20"/>
+      <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+       <StackPanel Margin="0,0,16,0"><TextBlock Text="Request timeout (seconds)" Margin="0,0,0,8"/><TextBox Text="{Binding Settings.TimeoutSeconds}"/></StackPanel>
+       <StackPanel Grid.Column="1" Margin="0,0,16,0"><TextBlock Text="Concurrent companies" Margin="0,0,0,8"/><TextBox Text="{Binding Settings.Concurrency}"/></StackPanel>
+       <StackPanel Grid.Column="2"><TextBlock Text="Requests / five minutes" Margin="0,0,0,8"/><TextBox Text="{Binding Settings.RequestsPerFiveMinutes}"/></StackPanel>
+      </Grid>
+      <TextBlock Text="Download folder" Margin="0,18,0,8"/><TextBox Text="{Binding Settings.DownloadFolder}"/>
+      <TextBlock Text="Temporary document folder" Margin="0,18,0,8"/><TextBox Text="{Binding Settings.TemporaryFolder}"/>
+      <CheckBox Content="Automatically save source PDFs" IsChecked="{Binding Settings.SaveSourcePdfs}"/>
+      <CheckBox Content="Enable offline OCR for scanned or unreadable PDF pages" IsChecked="{Binding Settings.EnableOcr}"/>
+      <TextBlock Text="Tesseract executable (English tessdata must be installed beside it)" Margin="0,8,0,8"/>
+      <TextBox Text="{Binding Settings.TesseractPath}"/>
+      <CheckBox Content="Process all pages requiring OCR" IsChecked="{Binding Settings.OcrAllPages}"/>
+      <TextBlock Text="Maximum OCR pages per document (0 = all pages, no page cap)" Margin="0,12,0,8"/>
+      <TextBox Text="{Binding Settings.OcrMaxPages}"/>
+      <TextBlock Text="OCR runs locally. Missing runtime/language data is reported as OCR Required. A partial page budget or uncertain financial evidence remains Needs Review; use all-pages mode for complete coverage." Style="{StaticResource MutedText}" Margin="0,10,0,16"/>
+      <StackPanel Orientation="Horizontal"><TextBlock Text="Theme" VerticalAlignment="Center" Margin="0,0,14,0"/><ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding Settings.Theme}"/></StackPanel>
+      <WrapPanel Margin="0,24,0,0"><Button Content="Save Settings" Command="{Binding SaveSettingsCommand}" Style="{StaticResource PrimaryButton}"/><Button Content="Test API Connection" Command="{Binding TestConnectionCommand}"/></WrapPanel>
+     </StackPanel></Border>
+    </StackPanel>
+   </ScrollViewer>
+  </Grid>
+  <Border Grid.Row="2" Background="#0A1427" BorderBrush="#243552" BorderThickness="0,1,0,0" Padding="24,8"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="290"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><TextBlock Text="{Binding Connection}" Foreground="#82B5EC" VerticalAlignment="Center" FontSize="12"/><StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock Text="{Binding Message}" Foreground="#B3C5E2" FontSize="12" TextWrapping="Wrap" MaxHeight="36"/></StackPanel></Grid></Border>
+ </Grid>
+</Window>
+
+
+
+
+
+

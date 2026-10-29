@@ -1,0 +1,14 @@
+﻿PrasaResearch third-party components
+
+Avalonia UI (MIT), including platform backends and Fluent/DataGrid controls
+ClosedXML (MIT) and its transitive OpenXML/font dependencies
+CsvHelper (MS-PL OR Apache-2.0)
+Microsoft.Data.Sqlite / SQLitePCLRaw and SQLite (MIT / component licenses; SQLite public domain)
+Microsoft.Extensions.DependencyInjection (MIT)
+System.Security.Cryptography.ProtectedData / .NET runtime (MIT)
+PdfPig (Apache-2.0)
+PDFtoImage (MIT), PDFium (BSD-style and bundled third-party licenses), SkiaSharp (MIT), Skia/HarfBuzz (component licenses)
+Optional Tesseract (Apache-2.0), Leptonica (BSD-style) and English trained data (Apache-2.0)
+Inno Setup installer runtime (Inno Setup License)
+
+Package copyright/license metadata and upstream license files are collected by the release script into licenses/ alongside this notice. This index is not a replacement for the included component license texts.

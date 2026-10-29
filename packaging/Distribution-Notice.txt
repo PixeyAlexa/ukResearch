@@ -1,0 +1,11 @@
+﻿PrasaResearch — Development Distribution Notice
+
+This build is provided for development and evaluation of the PrasaResearch application. The repository did not contain publisher-approved commercial license terms. This notice does not grant additional rights to the application's source code or authorize redistribution of third-party components beyond their own licenses.
+
+The application retrieves public filings from Companies House. Extracted financial values can require manual review and are not independently audited by this software.
+
+Your API key is stored through the operating system credential mechanism. Settings, job history and review evidence are retained in your user application-data folder during upgrade and uninstall.
+
+Third-party libraries and optional Tesseract OCR retain their respective licenses. See THIRD-PARTY-NOTICES.txt.
+
+A publisher-approved EULA must replace this notice before a public commercial release.

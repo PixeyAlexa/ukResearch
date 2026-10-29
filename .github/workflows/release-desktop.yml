@@ -1,0 +1,141 @@
+name: Desktop release packages
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Application version
+        required: true
+        default: '1.0.1'
+      platform:
+        description: Packages to build
+        type: choice
+        required: true
+        default: macos
+        options: [macos, windows, all]
+  push:
+    tags: ['desktop-v*']
+permissions:
+  contents: read
+jobs:
+  windows:
+    if: github.event_name != 'workflow_dispatch' || inputs.platform != 'macos'
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Install packaging and OCR dependencies
+        shell: pwsh
+        run: |
+          choco install innosetup tesseract -y --no-progress
+      - name: Shared core regression tests
+        shell: pwsh
+        run: dotnet test PrasaResearch.Core.Tests -c Release --filter 'Category!=Live&Category!=RealDocuments'
+      - name: Preserve original WPF regression tests
+        shell: pwsh
+        run: dotnet test PrasaResarch.Tests -c Release --filter 'Category!=Live&Category!=RealDocuments'
+      - name: Optional live API validation
+        shell: pwsh
+        env:
+          COMPANIES_HOUSE_TEST_API_KEY: ${{ secrets.COMPANIES_HOUSE_TEST_API_KEY }}
+        run: |
+          if ($env:COMPANIES_HOUSE_TEST_API_KEY) { dotnet test PrasaResearch.Core.Tests -c Release --filter 'Category=Live' }
+          else { Write-Output 'Live API tests were not configured.' }
+      - name: Publish and compile Windows installer
+        shell: pwsh
+        env:
+          BUILD_VERSION: ${{ inputs.version }}
+        run: |
+          $version = $env:BUILD_VERSION
+          if (-not $version) { $version = $env:GITHUB_REF_NAME.Replace('desktop-v','') }
+          ./packaging/Build-Windows.ps1 -Version $version
+      - name: Install, launch, upgrade and uninstall tests
+        shell: pwsh
+        run: ./packaging/Test-WindowsInstaller.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: PrasaResearch-Windows
+          path: |
+            Releases/Windows/*
+            artifacts/windows-installer-test.json
+  macos:
+    if: github.event_name != 'workflow_dispatch' || inputs.platform != 'windows'
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15-intel
+            rid: osx-x64
+            label: Intel
+          - runner: macos-15
+            rid: osx-arm64
+            label: AppleSilicon
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Install native OCR and packaging tools
+        run: brew install tesseract dylibbundler
+      - name: Shared services, PDF, OCR and persistence tests on macOS
+        run: dotnet test PrasaResearch.Core.Tests -c Release --filter 'Category!=Live&Category!=RealDocuments'
+      - name: Optional live API validation on macOS
+        env:
+          COMPANIES_HOUSE_TEST_API_KEY: ${{ secrets.COMPANIES_HOUSE_TEST_API_KEY }}
+        run: |
+          if [[ -n "$COMPANIES_HOUSE_TEST_API_KEY" ]]; then dotnet test PrasaResearch.Core.Tests -c Release --filter 'Category=Live';
+          else echo 'Live API tests were not configured.'; fi
+      - name: Optional Developer ID signing setup
+        env:
+          P12_BASE64: ${{ secrets.MACOS_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.MACOS_P12_PASSWORD }}
+        run: |
+          if [[ -n "$P12_BASE64" ]]; then
+            cert="$RUNNER_TEMP/developer-id.p12"
+            printf '%s' "$P12_BASE64" | base64 --decode > "$cert"
+            security create-keychain -p "$P12_PASSWORD" build.keychain
+            security unlock-keychain -p "$P12_PASSWORD" build.keychain
+            security import "$cert" -k build.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
+            security set-key-partition-list -S apple-tool:,apple: -k "$P12_PASSWORD" build.keychain
+            security list-keychains -d user -s build.keychain login.keychain-db
+            rm -f "$cert"
+          fi
+      - name: Optional notarization credentials
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [[ -n "$APPLE_ID" ]]; then
+            xcrun notarytool store-credentials PrasaResearch-CI --apple-id "$APPLE_ID" --password "$APPLE_APP_PASSWORD" --team-id "$APPLE_TEAM_ID"
+            echo 'MACOS_NOTARY_PROFILE=PrasaResearch-CI' >> "$GITHUB_ENV"
+          fi
+      - name: Build native app, launch check and branded DMG
+        env:
+          MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+          BUILD_VERSION: ${{ inputs.version }}
+        run: |
+          version="$BUILD_VERSION"
+          if [[ -z "$version" ]]; then version="${GITHUB_REF_NAME#desktop-v}"; fi
+          bash packaging/Build-macOS.sh '${{ matrix.rid }}' "$version"
+      - name: Test installation from the actual DMG
+        run: bash packaging/Test-macOS.sh '${{ matrix.label }}'
+      - name: Publish client installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: PrasaResearch-Setup-macOS-${{ matrix.label }}
+          if-no-files-found: error
+          path: Releases/macOS/PrasaResearch-Setup-macOS-${{ matrix.label }}.dmg
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: PrasaResearch-macOS-${{ matrix.label }}-diagnostics
+          path: |
+            Releases/macOS/*.json
+            Releases/macOS/*.png
+            Releases/macOS/*.sha256
+            Releases/macOS/signature-*.txt
