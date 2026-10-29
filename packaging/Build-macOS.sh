@@ -76,10 +76,22 @@ ln -s /Applications "$content/Applications"
 cp "$repo/packaging/branding/dmg-background.png" "$content/.background/background.png"
 volume="PrasaResearch-$label"
 hdiutil create -quiet -volname "$volume" -srcfolder "$content" -format UDRW "$stage/edit.dmg"
-mounted="$stage/mount"; mkdir -p "$mounted"
-hdiutil attach "$stage/edit.dmg" -nobrowse -mountpoint "$mounted" -quiet
+# Finder exposes disk objects for volumes mounted under /Volumes. A custom
+# temporary mountpoint works for hdiutil but is not discoverable as a Finder disk.
+hdiutil attach "$stage/edit.dmg" -nobrowse -plist > "$stage/attachment.plist"
+mounted="$(python3 - "$stage/attachment.plist" <<'PY'
+import plistlib, sys
+with open(sys.argv[1], 'rb') as stream:
+    data = plistlib.load(stream)
+print(next(entity['mount-point'] for entity in data['system-entities'] if 'mount-point' in entity))
+PY
+)"
 osascript <<EOF
 tell application "Finder"
+ repeat 30 times
+  if exists disk "$volume" then exit repeat
+  delay 1
+ end repeat
  tell disk "$volume"
   open
   set current view of container window to icon view
