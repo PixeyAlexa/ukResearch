@@ -2,6 +2,8 @@
 
 The Mac DMGs require successful native macOS builds and installation tests. The intended repository is https://github.com/PixeyAlexa/ukResearch. Local cross-published binaries alone are not validated Mac installers.
 
+Both native builds and installation tests now pass. See [installer downloads and verified status](macOS-Build-Status.md). The instructions below explain how to rebuild them.
+
 ## GitHub route: no personal Mac required
 
 1. Create a private GitHub repository, or use the repository that should own this application.

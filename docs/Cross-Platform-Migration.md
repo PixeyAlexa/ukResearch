@@ -80,7 +80,7 @@ Optional GitHub secrets: MACOS_P12_BASE64, MACOS_P12_PASSWORD, MACOS_SIGN_IDENTI
 
 .github/workflows/release-desktop.yml supports Run workflow and desktop-v* tags. Windows jobs run shared and original WPF tests, build the installer, install/launch/reinstall/uninstall it and upload artifacts. Separate macos-15-intel and macos-15 Apple Silicon jobs install OCR tools, execute shared tests, package/sign the app, launch it, build/verify DMGs and upload outputs. Optional signing steps are skipped without credentials. Artifacts are uploaded; no public GitHub Release is automatically published.
 
-Push this source/workflow to your GitHub repository and choose Actions > Desktop release packages > Run workflow. GitHub's macOS hosts do the native work, so no personal Mac is necessary. The workflow has been prepared but not dispatched in this session: there is no connected repository runner access or macOS host here. A failed native job is a release blocker, not a successful Mac package.
+The source is uploaded to https://github.com/PixeyAlexa/ukResearch. Choose Actions > Desktop release packages > Run workflow, platform `macos`, to create both native installers. Run 40822725141 completed successfully for both architectures. See [current macOS build status and downloads](macOS-Build-Status.md).
 
 ## Validation actually executed
 
@@ -89,7 +89,7 @@ Push this source/workflow to your GitHub repository and choose Actions > Desktop
 - The preserved WPF regression tests ran without source changes.
 - Windows installer compilation, installation, installed launch, bundled OCR, reinstall/upgrade, uninstall and test-data/database preservation passed.
 - osx-x64 and osx-arm64 self-contained publish outputs were prepared on Windows. This is cross-publish validation, not a macOS launch test.
-- No macOS Keychain/OCR/native UI test, DMG creation/mount, public signing or notarization has executed here. Those require the configured native jobs.
+- Both native macOS jobs passed all 87 shared-core tests, including Keychain/OCR; bundle launch and navigation; DMG verification/mount/copy; and installed application launch. The artifacts were downloaded and their SHA256 hashes checked against the runners' reports. Signatures are ad-hoc; Developer ID signing, notarization and Gatekeeper approval for public distribution are not verified.
 - Windows was tested on the current host, not separate Windows 10 and Windows 11 clean-machine VMs. Interactive native dialogs, accessibility, version-to-version upgrades and each target OS still need commercial-release QA.
 
 API live tests remain opt-in through a separately configured COMPANIES_HOUSE_TEST_API_KEY. Offline fixtures never show as real production company results.
