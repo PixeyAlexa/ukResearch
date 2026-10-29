@@ -47,6 +47,9 @@ find "$app" -type d -exec chmod 755 {} +
 chmod 755 "$app/Contents/MacOS/PrasaResearch" "$ocr/tesseract"
 identity="${MACOS_SIGN_IDENTITY:--}"
 while IFS= read -r -d '' file; do
+ # Sign every dependency before the main executable. Signing the apphost can
+ # validate its containing bundle immediately, including unsigned Intel PDFium.
+ if [[ "$file" == "$app/Contents/MacOS/PrasaResearch" ]]; then continue; fi
  if file -b "$file" | grep -q 'Mach-O'; then
   if [[ "$identity" == '-' ]]; then codesign --force --timestamp=none --sign - "$file";
   else codesign --force --options runtime --timestamp --sign "$identity" "$file"; fi
