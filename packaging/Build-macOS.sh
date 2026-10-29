@@ -13,7 +13,10 @@ cleanup() { if [[ -n "$mounted" ]]; then hdiutil detach "$mounted" -quiet || tru
 trap cleanup EXIT
 app="$stage/PrasaResearch.app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$repo/Releases/macOS"
-dotnet publish "$repo/PrasaResearch.Desktop" -c Release -r "$rid" --self-contained true -p:Version="$version" -o "$app/Contents/MacOS"
+# Keep managed PE assemblies inside the .NET apphost. Loose .dll assemblies in
+# Contents/MacOS are incorrectly treated as unsigned nested code by codesign.
+# Native dylibs stay beside the host and are signed individually below.
+dotnet publish "$repo/PrasaResearch.Desktop" -c Release -r "$rid" --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=false -p:Version="$version" -o "$app/Contents/MacOS"
 cp "$repo/packaging/macos/Info.plist" "$app/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $version" "$app/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $version" "$app/Contents/Info.plist"
