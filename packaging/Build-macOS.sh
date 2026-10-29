@@ -17,6 +17,9 @@ mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$repo/Releases/macOS"
 # Contents/MacOS are incorrectly treated as unsigned nested code by codesign.
 # Native dylibs stay beside the host and are signed individually below.
 dotnet publish "$repo/PrasaResearch.Desktop" -c Release -r "$rid" --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=false -p:Version="$version" -o "$app/Contents/MacOS"
+for symbols in "$app/Contents/MacOS/"*.pdb; do
+ if [[ -f "$symbols" ]]; then mv "$symbols" "$app/Contents/Resources/"; fi
+done
 cp "$repo/packaging/macos/Info.plist" "$app/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $version" "$app/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $version" "$app/Contents/Info.plist"
@@ -26,7 +29,7 @@ for size in 16 32 128 256 512; do
  double=$((size*2)); sips -z "$double" "$double" "$repo/packaging/branding/app.png" --out "$iconset/icon_${size}x${size}@2x.png" >/dev/null
 done
 iconutil -c icns "$iconset" -o "$app/Contents/Resources/PrasaResearch.icns"
-ocr="$app/Contents/MacOS/ocr"; mkdir -p "$ocr/tessdata"
+ocr="$app/Contents/Resources/ocr"; mkdir -p "$ocr/tessdata"
 cp "$(command -v tesseract)" "$ocr/tesseract"
 data="$(brew --prefix)/share/tessdata"
 cp "$data/eng.traineddata" "$data/osd.traineddata" "$ocr/tessdata/"
@@ -48,7 +51,7 @@ while IFS= read -r -d '' file; do
   if [[ "$identity" == '-' ]]; then codesign --force --timestamp=none --sign - "$file";
   else codesign --force --options runtime --timestamp --sign "$identity" "$file"; fi
  fi
-done < <(find "$app/Contents/MacOS" -type f -print0)
+done < <(find "$app/Contents/MacOS" "$ocr" -type f -print0)
 if [[ "$identity" == '-' ]]; then
  codesign --force --deep --sign - --entitlements "$repo/packaging/macos/entitlements.plist" "$app"
 else

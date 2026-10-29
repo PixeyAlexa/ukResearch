@@ -23,7 +23,7 @@ hdiutil detach "$mounted" -quiet; mounted=''
 app="$stage/Applications/PrasaResearch.app"
 codesign --verify --deep --strict --verbose=2 "$app"
 plutil -lint "$app/Contents/Info.plist"
-ocr="$app/Contents/MacOS/ocr"
+ocr="$app/Contents/Resources/ocr"
 "$ocr/tesseract" --list-langs --tessdata-dir "$ocr/tessdata" | grep -qx eng
 export PRASARESEARCH_DATA_DIR="$stage/user-data"
 python3 - "$app" "$repo/Releases/macOS/installed-launch-$label.json" <<'PY'
